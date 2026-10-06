@@ -47,6 +47,10 @@ export function createTable() {
   wall(590, 300, 590, 775); // right wall (outside the plunger lane)
   wall(550, 340, 550, 775); // plunger lane divider
   wall(550, 775, 590, 775); // plunger lane floor
+  // Gate across the top of the lane: a launched ball passes up through it, but a ball coming
+  // back down from the playfield rolls off it instead of dropping into the plunger lane.
+  const gateNormal = { nx: -Math.SQRT1_2, ny: -Math.SQRT1_2 };
+  wall(550, 340, 590, 300, { oneWay: gateNormal });
 
   // Outlane dividers: the lane between wall and divider drains (the left one can kick back).
   wall(45, 525, 45, 625);
@@ -63,7 +67,8 @@ export function createTable() {
   const bumpers = [
     { x: 225, y: 215, r: 26, points: 100, litFor: 0 },
     { x: 335, y: 215, r: 26, points: 100, litFor: 0 },
-    { x: 280, y: 290, r: 26, points: 100, litFor: 0 },
+    { x: 200, y: 345, r: 26, points: 100, litFor: 0 },
+    { x: 360, y: 345, r: 26, points: 100, litFor: 0 },
   ];
 
   const flippers = [
@@ -80,7 +85,7 @@ export function createTable() {
     { id: 'w2', kind: 'wormhole', x: 500, y: 440, r: 16, to: 'w1', points: 250 },
     { id: 'w3', kind: 'wormhole', x: 485, y: 250, r: 16, to: 'w4', points: 250 },
     { id: 'w4', kind: 'wormhole', x: 170, y: 440, r: 16, to: 'w3', points: 250 },
-    { id: 'ramp', kind: 'ramp', x: 280, y: 470, r: 20, exit: { x: 280, y: 120 }, points: 500 },
+    { id: 'ramp', kind: 'ramp', x: 280, y: 470, r: 20, width: 40, exit: { x: 280, y: 120 }, points: 500 },
   ];
 
   const rollovers = ['A', 'B', 'C'].map((letter, i) => ({

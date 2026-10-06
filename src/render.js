@@ -12,7 +12,7 @@ export function render(ctx, game, theme = classicTheme) {
   ctx.lineCap = 'round';
   ctx.lineWidth = 4;
   for (const w of table.walls) {
-    ctx.strokeStyle = w.points ? theme.slingshot : theme.wall;
+    ctx.strokeStyle = w.points ? theme.slingshot : w.oneWay ? theme.gate : theme.wall;
     line(ctx, w.ax, w.ay, w.bx, w.by);
   }
 
@@ -42,9 +42,17 @@ export function render(ctx, game, theme = classicTheme) {
   drawPlunger(ctx, game, theme);
 
   ctx.fillStyle = theme.ball;
+  const onRamp = (b) => b.transit && b.transit.kind === 'ramp';
   for (const b of game.balls) {
     if (b.transit && !b.transit.visible) continue;
+    if (onRamp(b)) continue;
     circle(ctx, b.x, b.y, b.r);
+    ctx.fill();
+  }
+  drawRamp(ctx, game, theme);
+  ctx.fillStyle = theme.ball;
+  for (const b of game.balls.filter(onRamp)) {
+    circle(ctx, b.x, b.y, b.r + 1);
     ctx.fill();
   }
 
@@ -108,17 +116,7 @@ function drawPortals(ctx, game, theme) {
   const spin = performance.now() / 600;
   ctx.lineWidth = 3;
   for (const p of game.table.portals) {
-    if (p.kind === 'ramp') {
-      ctx.strokeStyle = theme.ramp;
-      ctx.setLineDash([10, 8]);
-      line(ctx, p.x, p.y, p.exit.x, p.exit.y);
-      ctx.setLineDash([]);
-      circle(ctx, p.x, p.y, p.r);
-      ctx.stroke();
-      circle(ctx, p.exit.x, p.exit.y, 8);
-      ctx.stroke();
-      continue;
-    }
+    if (p.kind === 'ramp') continue;
     ctx.fillStyle = theme.wormholeCore;
     circle(ctx, p.x, p.y, p.r);
     ctx.fill();
@@ -204,6 +202,42 @@ function drawSpinners(ctx, game, theme) {
     ctx.stroke();
     ctx.lineWidth = 4;
   }
+}
+
+// The ramp is drawn over everything on the table, so whatever passes beneath it is hidden.
+function drawRamp(ctx, game, theme) {
+  const ramp = game.table.portals.find((p) => p.kind === 'ramp');
+  const near = ramp.width / 2;
+  const far = near * 0.7;
+  const { x, y, exit } = ramp;
+
+  ctx.fillStyle = theme.rampSurface;
+  ctx.beginPath();
+  ctx.moveTo(x - near, y);
+  ctx.lineTo(exit.x - far, exit.y);
+  ctx.lineTo(exit.x + far, exit.y);
+  ctx.lineTo(x + near, y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = theme.rampStripe;
+  ctx.lineWidth = 2;
+  for (let i = 1; i <= 6; i++) {
+    const f = i / 7;
+    const cy = y + (exit.y - y) * f;
+    const w = (near + (far - near) * f) * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x - w, cy + w * 0.6);
+    ctx.lineTo(x, cy);
+    ctx.lineTo(x + w, cy + w * 0.6);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = theme.ramp;
+  ctx.lineWidth = 3;
+  line(ctx, x - near, y, exit.x - far, exit.y);
+  line(ctx, x + near, y, exit.x + far, exit.y);
+  line(ctx, x - near, y, x + near, y);
 }
 
 function drawPlunger(ctx, game, theme) {

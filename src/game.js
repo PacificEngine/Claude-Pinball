@@ -1,4 +1,4 @@
-import { stepBall, collideCircle, collideSegment } from './physics.js';
+import { stepBall, collideCircle, collideSegment, isBehindOneWay } from './physics.js';
 import { createFlipper, updateFlipper, collideFlipper } from './flipper.js';
 import { createTable } from './table.js';
 import { emit, drainEvents } from './events.js';
@@ -89,17 +89,33 @@ export function restart(game) {
 }
 
 export function chargePlunger(game, amount) {
-  if (game.phase !== 'plunging') return;
+  if (game.phase === 'gameover') return;
   game.plungerCharge = Math.min(1, game.plungerCharge + amount);
 }
 
+// The plunger can be pulled at any time and launches whatever is resting in its lane.
+// Only a fresh serve starts the ball save and the skill shot.
 export function releasePlunger(game) {
-  if (game.phase !== 'plunging') return;
-  game.ball.vy = -(300 + 900 * game.plungerCharge);
+  if (game.phase === 'gameover') return;
+  const speed = 300 + 900 * game.plungerCharge;
   game.plungerCharge = 0;
-  game.phase = 'playing';
-  game.ballSave = BALL_SAVE_SECONDS;
-  emit(game, 'launch');
+
+  if (game.phase === 'plunging') {
+    game.ball.vy = -speed;
+    game.phase = 'playing';
+    game.ballSave = BALL_SAVE_SECONDS;
+    emit(game, 'launch', { fresh: true });
+    return;
+  }
+
+  const { laneLeft, plungerStart } = game.table;
+  const inLane = game.balls.filter((b) => !b.transit && b.x > laneLeft && b.y > plungerStart.y - 25);
+  if (inLane.length === 0) return;
+  for (const b of inLane) {
+    b.vx = 0;
+    b.vy = -speed;
+  }
+  emit(game, 'launch', { fresh: false });
 }
 
 export function setFlipper(game, name, pressed) {
@@ -157,11 +173,6 @@ export function update(game, dt) {
   for (const ball of [...game.balls]) {
     if (!ball.transit && ball.y > table.height + 20) drainBall(game, ball);
   }
-  if (game.phase !== 'playing') return;
-  const ball = game.ball;
-  const restingInLane =
-    game.balls.length === 1 && !ball.transit && ball.x > table.laneLeft && ball.y > table.plungerStart.y - 20 && Math.hypot(ball.vx, ball.vy) < 20;
-  if (restingInLane) serveBall(game); // weak plunge: ball fell back, let the player try again
 }
 
 function stepPlayingBall(game, ball, h) {
@@ -176,6 +187,7 @@ function stepPlayingBall(game, ball, h) {
   }
 
   for (const w of table.walls) {
+    if (isBehindOneWay(ball, w)) continue;
     const hit = collideSegment(ball, w, w.restitution);
     if (hit && hit.speed > 0 && w.points) {
       addScore(game, w.points);
