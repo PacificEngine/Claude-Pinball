@@ -1,4 +1,3 @@
-import { TILT } from './game.js';
 import { flipperSegment, FLIPPER_THICKNESS } from './flipper.js';
 
 export function render(ctx, game) {
@@ -62,22 +61,14 @@ export function render(ctx, game) {
 
 function drawTilt(ctx, game) {
   const { width } = game.table;
-  const barWidth = 120;
-  const x = (width - barWidth) / 2;
-  ctx.strokeStyle = '#888';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(x, 44, barWidth, 8);
-  ctx.fillStyle = game.tiltWarning ? '#ff5252' : '#4fc3f7';
-  ctx.fillRect(x, 44, Math.min(1, game.tilt / TILT.limit) * barWidth, 8);
-
   ctx.textAlign = 'center';
   ctx.font = '28px monospace';
   if (game.tilted) {
     ctx.fillStyle = '#ff5252';
-    ctx.fillText('TILT', width / 2, 90);
+    ctx.fillText('TILT', width / 2, 60);
   } else if (game.tiltWarning) {
     ctx.fillStyle = '#ffb74d';
-    ctx.fillText('DANGER', width / 2, 90);
+    ctx.fillText('DANGER', width / 2, 60);
   }
 }
 
