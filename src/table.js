@@ -52,8 +52,33 @@ export function createTable() {
   const guides = [inlaneGuide(flippers[0], 10), inlaneGuide(flippers[1], 550)];
   for (const g of guides) wall(g.ax, g.ay, g.bx, g.by);
 
+  const portals = [
+    { id: 'w1', kind: 'wormhole', x: 110, y: 140, r: 16, to: 'w2', points: 250 },
+    { id: 'w2', kind: 'wormhole', x: 490, y: 420, r: 16, to: 'w1', points: 250 },
+    { id: 'w3', kind: 'wormhole', x: 490, y: 140, r: 16, to: 'w4', points: 250 },
+    { id: 'w4', kind: 'wormhole', x: 60, y: 420, r: 16, to: 'w3', points: 250 },
+    { id: 'ramp', kind: 'ramp', x: 300, y: 470, r: 20, exit: { x: 300, y: 120 }, points: 500 },
+  ];
+
+  const rollovers = ['A', 'B', 'C'].map((letter, i) => ({
+    letter, x: 230 + i * 70, y: 70, r: 12, points: 100, lit: false, armed: true,
+  }));
+
+  const dropBank = {
+    bonus: 1000,
+    resetSeconds: 1,
+    resetIn: 0,
+    targets: [280, 320, 360].map((y) => ({ ax: 70, ay: y, bx: 70, by: y + 28, points: 50, standing: true })),
+  };
+
+  const lock = { x: 505, y: 330, r: 16, locked: 0, needed: 2, points: 1000, multiballPoints: 5000 };
+
   return {
     width,
+    lock,
+    dropBank,
+    portals,
+    rollovers,
     height,
     laneLeft: 550,
     plungerStart: { x: 570, y: 755 },
