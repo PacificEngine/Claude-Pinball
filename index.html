@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Pinball</title>
+    <style>
+      body { margin: 0; background: #0b0b1a; color: #ddd; font-family: monospace; display: flex; flex-direction: column; align-items: center; }
+      canvas { height: 92vh; max-width: 100vw; margin-top: 8px; }
+      p { margin: 6px; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="table" width="600" height="800"></canvas>
+    <p>Z / ← left flipper &nbsp; / / → right flipper &nbsp; hold Space to charge plunger, release to launch &nbsp; Enter to restart</p>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
