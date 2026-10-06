@@ -94,6 +94,12 @@ export function chargePlunger(game, amount) {
   game.plungerCharge = Math.min(1, game.plungerCharge + amount);
 }
 
+// Touch dragging sets the charge directly, so it can go down as well as up.
+export function setPlungerCharge(game, value) {
+  if (game.phase === 'gameover') return;
+  game.plungerCharge = Math.max(0, Math.min(1, value));
+}
+
 // The plunger can be pulled at any time and launches whatever is resting in its lane.
 // Only a fresh serve starts the ball save and the skill shot.
 export function releasePlunger(game) {

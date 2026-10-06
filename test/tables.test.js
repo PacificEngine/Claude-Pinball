@@ -3,6 +3,7 @@ import { TABLES } from '../src/tables/index.js';
 import { createGame, restart } from '../src/game.js';
 import { classicTheme } from '../src/theme.js';
 import { createMenu, moveSelection, selectedTable } from '../src/menu.js';
+import { cardRects, cardAt } from '../src/renderMenu.js';
 import { getHighScore, recordScore } from '../src/highScores.js';
 
 const memoryStorage = () => {
@@ -124,5 +125,25 @@ describe('high scores', () => {
     const s = memoryStorage();
     s.setItem('pinball.high.classic', 'not a number');
     expect(getHighScore(s, 'classic')).toBe(0);
+  });
+});
+
+describe('menu cards by touch', () => {
+  const menu = createMenu(TABLES);
+  const rects = cardRects(menu);
+
+  it('has one card per table, left to right and not overlapping', () => {
+    expect(rects).toHaveLength(TABLES.length);
+    for (let i = 1; i < rects.length; i++) expect(rects[i].x).toBeGreaterThanOrEqual(rects[i - 1].x + rects[i - 1].w);
+  });
+
+  it('finds the card under a point in canvas coordinates', () => {
+    rects.forEach((r, i) => expect(cardAt(menu, r.x + r.w / 2, r.y + r.h / 2)).toBe(i));
+  });
+
+  it('finds nothing in the gaps or outside the cards', () => {
+    expect(cardAt(menu, 5, 5)).toBe(-1);
+    expect(cardAt(menu, rects[0].x + rects[0].w + 2, rects[0].y + 10)).toBe(-1);
+    expect(cardAt(menu, rects[0].x + 10, rects[0].y + rects[0].h + 5)).toBe(-1);
   });
 });
