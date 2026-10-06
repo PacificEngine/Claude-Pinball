@@ -46,3 +46,10 @@ export function collideSegment(ball, seg, restitution, surface, thickness = 0) {
   const p = closestPointOnSegment(seg, ball.x, ball.y);
   return collideAt(ball, p.x, p.y, thickness, restitution, surface);
 }
+
+// A one-way wall only blocks a ball on the side its normal points to. A ball whose centre
+// is on the other side passes straight through (used by the plunger lane gate).
+export function isBehindOneWay(ball, wall) {
+  if (!wall.oneWay) return false;
+  return (ball.x - wall.ax) * wall.oneWay.nx + (ball.y - wall.ay) * wall.oneWay.ny < 0;
+}

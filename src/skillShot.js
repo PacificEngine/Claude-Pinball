@@ -6,6 +6,7 @@ const SPOILERS = ['bumper', 'slingshot', 'target', 'wormhole', 'ramp', 'ball-loc
 
 export function skillShotListener(game, event) {
   if (event.type === 'launch') {
+    if (!event.fresh) return;
     game.skillShot = SKILL_SHOT.seconds;
   } else if (SPOILERS.includes(event.type)) {
     game.skillShot = 0;
