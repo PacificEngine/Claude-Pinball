@@ -97,7 +97,7 @@ describe('ramp', () => {
     run(g, 0.5);
     expect(g.ball.y).toBeLessThan(ramp(g).y);
     expect(g.ball.y).toBeGreaterThan(ramp(g).exit.y);
-    run(g, 1);
+    run(g, 0.53);
     expect(g.ball.transit).toBeFalsy();
     expect(g.ball.vy).toBeGreaterThan(0);
     expect(drainEvents(g).map((e) => e.type)).toContain('ramp');

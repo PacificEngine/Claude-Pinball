@@ -22,6 +22,7 @@ export const classicTheme = {
   rolloverLit: '#fff176',
   dropTarget: '#ef5350',
   dropTargetDown: '#3a2a3a',
+  spinner: '#80deea',
   lock: '#ffa726',
   banner: '#fff176',
 };

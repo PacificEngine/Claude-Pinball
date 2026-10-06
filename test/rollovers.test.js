@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { withoutCombo } from './helpers.js';
 import { createGame, update, drainEvents } from '../src/game.js';
 
 const playing = () => {
@@ -49,7 +50,7 @@ describe('rollover lanes', () => {
   });
 
   it('multiply the points scored while it is raised', () => {
-    const g = playing();
+    const g = withoutCombo(playing());
     g.table.rollovers.forEach((lane) => roll(g, lane));
     const before = g.score;
     const bumper = g.table.bumpers[0];

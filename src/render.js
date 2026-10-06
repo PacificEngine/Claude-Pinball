@@ -20,6 +20,8 @@ export function render(ctx, game, theme = classicTheme) {
   drawRollovers(ctx, game, theme);
   drawDropTargets(ctx, game, theme);
   drawLock(ctx, game, theme);
+  drawSpinners(ctx, game, theme);
+  drawKickback(ctx, game, theme);
 
   for (const b of table.bumpers) {
     ctx.fillStyle = b.litFor > 0 ? theme.bumperLit : theme.bumper;
@@ -55,12 +57,22 @@ export function render(ctx, game, theme = classicTheme) {
     ctx.fillText('MULTIBALL', 24, 82);
     ctx.fillStyle = theme.text;
   }
+  if (game.combo.count >= 2) {
+    ctx.fillStyle = theme.banner;
+    ctx.fillText(`COMBO x${game.combo.count}`, 24, 106);
+    ctx.fillStyle = theme.text;
+  }
   if (game.multiplier > 1) {
     ctx.fillStyle = theme.banner;
     ctx.fillText(`BONUS x${game.multiplier}`, 24, 56);
     ctx.fillStyle = theme.text;
   }
   ctx.textAlign = 'right';
+  if (game.ballSave > 0) {
+    ctx.fillStyle = theme.rolloverLit;
+    ctx.fillText(`SAVE ${Math.ceil(game.ballSave)}`, table.width - 24, 56);
+    ctx.fillStyle = theme.text;
+  }
   ctx.fillText(`BALLS ${game.ballsLeft}`, table.width - 24, 30);
 
   drawTilt(ctx, game, theme);
@@ -171,6 +183,27 @@ function drawLock(ctx, game, theme) {
   ctx.font = '11px monospace';
   ctx.textAlign = 'center';
   ctx.fillText('LOCK', lock.x, lock.y + lock.r + 14);
+}
+
+function drawKickback(ctx, game, theme) {
+  const k = game.table.kickback;
+  ctx.strokeStyle = k.armed ? theme.rolloverLit : theme.textMuted;
+  ctx.lineWidth = 3;
+  line(ctx, k.x - 8, k.y + 8, k.x, k.y - 8);
+  line(ctx, k.x + 8, k.y + 8, k.x, k.y - 8);
+}
+
+function drawSpinners(ctx, game, theme) {
+  ctx.strokeStyle = theme.spinner;
+  ctx.lineWidth = 4;
+  for (const s of game.table.spinners) {
+    const half = Math.abs(Math.cos(s.turns * Math.PI * 2)) * s.r;
+    line(ctx, s.x - half, s.y, s.x + half, s.y);
+    ctx.lineWidth = 1;
+    circle(ctx, s.x, s.y, s.r);
+    ctx.stroke();
+    ctx.lineWidth = 4;
+  }
 }
 
 function drawPlunger(ctx, game, theme) {

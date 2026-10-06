@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { withoutCombo } from './helpers.js';
 import { createGame, update, drainEvents } from '../src/game.js';
 import { emit } from '../src/events.js';
 import { MISSIONS } from '../src/missions.js';
@@ -27,7 +28,7 @@ describe('missions', () => {
   });
 
   it('pay a reward without the multiplier, announce it, and move to the next', () => {
-    const g = createGame();
+    const g = withoutCombo(createGame());
     g.multiplier = 5;
     fire(g, MISSIONS[0].event, MISSIONS[0].goal);
     expect(g.score).toBe(MISSIONS[0].reward);
