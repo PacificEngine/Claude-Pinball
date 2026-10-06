@@ -70,3 +70,26 @@ describe('collideFlipper', () => {
     expect(Math.hypot(b.vx, b.vy)).toBeLessThan(1);
   });
 });
+
+describe('flipper symmetry', () => {
+  const kickFrom = (f) => {
+    const s = flipperSegment(f);
+    const b = { x: s.ax + (s.bx - s.ax) * 0.75, y: s.ay + (s.by - s.ay) * 0.75 - 16, vx: 0, vy: 0, r: 8 };
+    updateFlipper(f, 0.01, true);
+    collideFlipper(b, f, 0.4);
+    return b;
+  };
+
+  it('the right flipper kicks a ball up as hard as the left one', () => {
+    const l = kickFrom(left());
+    const r = kickFrom(right());
+    expect(r.vy).toBeLessThan(-50);
+    expect(r.vy).toBeCloseTo(l.vy, 0);
+  });
+
+  it('the right flipper kicks the ball toward the center, like the left', () => {
+    const l = kickFrom(left());
+    const r = kickFrom(right());
+    expect(Math.sign(r.vx)).toBe(-Math.sign(l.vx));
+  });
+});

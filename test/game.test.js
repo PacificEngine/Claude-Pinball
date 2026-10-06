@@ -115,3 +115,32 @@ describe('table integrity', () => {
     }
   });
 });
+
+describe('inlane guides', () => {
+  // Captured from a real stuck game: the ball wedged between the right guide and the
+  // flipper's pivot cap. Once the guide meets the flipper's top surface flush, a ball
+  // anywhere along the inlane must roll down the flipper and drain.
+  const stuckSpots = [
+    ['right', 396, 686.3],
+    ['left', 164, 686.3],
+  ];
+  for (const [side, x, y] of stuckSpots) {
+    it(`does not wedge a ball between the ${side} guide and flipper pivot`, () => {
+      const g = createGame();
+      g.phase = 'playing';
+      Object.assign(g.ball, { x, y, vx: 0, vy: 0 });
+      run(g, 6);
+      expect(g.ballsLeft).toBe(2);
+    });
+  }
+
+  it('lets a ball roll down either guide, onto the flipper, and drain', () => {
+    for (const x of [30, 60, 120, 500, 520, 540]) {
+      const g = createGame();
+      g.phase = 'playing';
+      Object.assign(g.ball, { x, y: 590, vx: 0, vy: 0 });
+      run(g, 8);
+      expect(g.ballsLeft, `ball released at x=${x}`).toBe(2);
+    }
+  });
+});
