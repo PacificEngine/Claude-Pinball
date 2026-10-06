@@ -32,19 +32,31 @@ export function renderMenu(ctx, menu, scores, audio) {
   ctx.font = '16px monospace';
   ctx.fillText('choose a table', WIDTH / 2, 165);
 
-  const total = menu.tables.length * CARD_W + (menu.tables.length - 1) * GAP;
-  menu.tables.forEach((table, i) => {
-    const x = (WIDTH - total) / 2 + i * (CARD_W + GAP);
-    drawCard(ctx, table, x, 230, i === menu.index, scores[table.id] ?? 0, theme);
+  cardRects(menu).forEach((rect, i) => {
+    const table = menu.tables[i];
+    drawCard(ctx, table, rect.x, rect.y, i === menu.index, scores[table.id] ?? 0, theme);
   });
 
   ctx.textAlign = 'center';
   ctx.fillStyle = theme.text;
   ctx.font = '16px monospace';
-  ctx.fillText('← → choose     Enter start', WIDTH / 2, 560);
+  ctx.fillText('← → or tap to choose     Enter or tap again to start', WIDTH / 2, 560);
   ctx.fillStyle = theme.textMuted;
   ctx.font = '13px monospace';
   ctx.fillText(`M music ${audio.musicOn ? 'on' : 'off'}     N sound ${audio.sfxOn ? 'on' : 'off'}`, WIDTH / 2, 590);
+}
+
+const CARD_TOP = 230;
+
+// Where each card is, in canvas coordinates, shared by drawing and touch hit-testing.
+export function cardRects(menu) {
+  const total = menu.tables.length * CARD_W + (menu.tables.length - 1) * GAP;
+  return menu.tables.map((_, i) => ({ x: (WIDTH - total) / 2 + i * (CARD_W + GAP), y: CARD_TOP, w: CARD_W, h: CARD_H }));
+}
+
+// The index of the card under a point, or -1.
+export function cardAt(menu, x, y) {
+  return cardRects(menu).findIndex((r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
 }
 
 function drawCard(ctx, table, x, y, selected, best, menuTheme) {

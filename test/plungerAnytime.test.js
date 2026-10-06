@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createGame, update, chargePlunger, releasePlunger, drainEvents } from '../src/game.js';
+import { createGame, update, chargePlunger, releasePlunger, setPlungerCharge, drainEvents } from '../src/game.js';
 
 const run = (g, seconds) => {
   for (let t = 0; t < seconds; t += 1 / 120) update(g, 1 / 120);
@@ -78,6 +78,36 @@ describe('plunger during play', () => {
     const g = playing();
     g.phase = 'gameover';
     chargePlunger(g, 1);
+    expect(g.plungerCharge).toBe(0);
+  });
+});
+
+describe('setting the plunger charge exactly (touch drag)', () => {
+  it('sets the charge to the given value, clamped to 0..1', () => {
+    const g = createGame();
+    setPlungerCharge(g, 0.4);
+    expect(g.plungerCharge).toBe(0.4);
+    setPlungerCharge(g, 7);
+    expect(g.plungerCharge).toBe(1);
+    setPlungerCharge(g, -3);
+    expect(g.plungerCharge).toBe(0);
+  });
+
+  it('can lower a charge as well as raise it, and launches at what it was left at', () => {
+    const weak = createGame();
+    setPlungerCharge(weak, 1);
+    setPlungerCharge(weak, 0.2);
+    releasePlunger(weak);
+    const strong = createGame();
+    setPlungerCharge(strong, 1);
+    releasePlunger(strong);
+    expect(weak.ball.vy).toBeGreaterThan(strong.ball.vy);
+  });
+
+  it('is ignored once the game is over', () => {
+    const g = createGame();
+    g.phase = 'gameover';
+    setPlungerCharge(g, 1);
     expect(g.plungerCharge).toBe(0);
   });
 });
