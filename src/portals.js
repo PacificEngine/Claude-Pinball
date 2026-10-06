@@ -5,7 +5,7 @@ const MIN_EXIT_SPEED = 250;
 // The ramp is entered at the front, moving up the table. It keeps most of the ball's speed:
 // a little extra is lost climbing, and a little is regained coming down the far side.
 const RAMP_MIN_SPEED = 450;
-const RAMP_MAX_ENTRY_ANGLE_TAN = 0.7; // about 35 degrees off straight up
+const RAMP_MIN_ENTRY_COSINE = 0.819; // within about 35 degrees of the ramp's direction
 const RAMP_CLIMB_LOSS = 0.15;
 const RAMP_DESCENT_GAIN = 0.08;
 const RAMP_MIN_SECONDS = 0.15;
@@ -18,7 +18,7 @@ export function checkPortals(game, ball, addScore) {
   for (const p of game.table.portals) {
     if (Math.hypot(ball.x - p.x, ball.y - p.y) >= p.r) continue;
     if (p.kind === 'wormhole') return enterWormhole(game, ball, p, addScore);
-    if (p.kind === 'ramp' && entersRampFromFront(ball)) return enterRamp(game, ball, p, addScore);
+    if (p.kind === 'ramp' && entersRampFromFront(ball, p)) return enterRamp(game, ball, p, addScore);
   }
 }
 
@@ -42,9 +42,13 @@ function enterWormhole(game, ball, p, addScore) {
   emit(game, 'wormhole', { x: p.x, y: p.y, toX: dest.x, toY: dest.y });
 }
 
-function entersRampFromFront(ball) {
+// Enter at the front: fast enough, and heading the way the ramp runs.
+function entersRampFromFront(ball, ramp) {
   const speed = Math.hypot(ball.vx, ball.vy);
-  return ball.vy < 0 && speed >= RAMP_MIN_SPEED && Math.abs(ball.vx) <= RAMP_MAX_ENTRY_ANGLE_TAN * -ball.vy;
+  if (speed < RAMP_MIN_SPEED) return false;
+  const length = Math.hypot(ramp.exit.x - ramp.x, ramp.exit.y - ramp.y);
+  const along = (ball.vx * (ramp.exit.x - ramp.x) + ball.vy * (ramp.exit.y - ramp.y)) / length;
+  return along / speed >= RAMP_MIN_ENTRY_COSINE;
 }
 
 function enterRamp(game, ball, p, addScore) {

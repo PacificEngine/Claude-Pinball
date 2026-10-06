@@ -11,9 +11,37 @@ function inlaneGuide(flipper, wallX) {
   return { ax: wallX, ay: ay - dy * t, bx: ax, by: ay };
 }
 
-// Table layout as plain data. New features (ramps, targets, missions) can be added
+import { classicLayout } from './layouts/classic.js';
+
+const ORBIT_RADIUS = 250;
+const FUNNEL = { restitution: 0.5 };
+
+// Walls flaring out below a ramp entrance make it easier to hit. Everything is derived from
+// the ramp's own direction, so the ramp may run at any angle.
+function rampDirection(ramp) {
+  const length = Math.hypot(ramp.exit.x - ramp.x, ramp.exit.y - ramp.y);
+  return { dx: (ramp.exit.x - ramp.x) / length, dy: (ramp.exit.y - ramp.y) / length, length };
+}
+
+function funnelWalls(ramp) {
+  const { dx, dy } = rampDirection(ramp);
+  const nx = -dy;
+  const ny = dx;
+  const { offset, length, flare } = ramp.funnel;
+  const half = ramp.width / 2;
+  return [-1, 1].map((side) => {
+    const top = { x: ramp.x - dx * offset + nx * side * half, y: ramp.y - dy * offset + ny * side * half };
+    const bottom = {
+      x: ramp.x - dx * (offset + length) + nx * side * (half + flare),
+      y: ramp.y - dy * (offset + length) + ny * side * (half + flare),
+    };
+    return { ax: top.x, ay: top.y, bx: bottom.x, by: bottom.y, ...FUNNEL };
+  });
+}
+
+// Table as plain data, built from the shared base plus a layout. New features can be added
 // here without touching the physics.
-export function createTable() {
+export function createTable(layout = classicLayout) {
   const width = 600;
   const height = 800;
   const walls = [];
@@ -30,18 +58,16 @@ export function createTable() {
     );
   }
 
-  // Orbit rails: arcs just inside the arch, with a wide gap at the top. A hard-hit ball
-  // rides the channel between rail and arch; a soft one drops into the gap.
-  const orbit = (from, to, steps) => {
-    for (let i = 0; i < steps; i++) {
-      const a0 = from + ((to - from) * i) / steps;
-      const a1 = from + ((to - from) * (i + 1)) / steps;
-      const r = 250;
-      wall(arch.cx + r * Math.cos(a0), arch.cy + r * Math.sin(a0), arch.cx + r * Math.cos(a1), arch.cy + r * Math.sin(a1));
+  for (const rail of layout.orbit) {
+    for (let i = 0; i < rail.steps; i++) {
+      const a0 = rail.from + ((rail.to - rail.from) * i) / rail.steps;
+      const a1 = rail.from + ((rail.to - rail.from) * (i + 1)) / rail.steps;
+      wall(
+        arch.cx + ORBIT_RADIUS * Math.cos(a0), arch.cy + ORBIT_RADIUS * Math.sin(a0),
+        arch.cx + ORBIT_RADIUS * Math.cos(a1), arch.cy + ORBIT_RADIUS * Math.sin(a1),
+      );
     }
-  };
-  orbit(Math.PI + 0.35, Math.PI + 0.9, 6);
-  orbit(2 * Math.PI - 0.9, 2 * Math.PI - 0.35, 6);
+  }
 
   wall(10, 300, 10, 800); // left wall, running down past the outlane to the drain
   wall(590, 300, 590, 775); // right wall (outside the plunger lane)
@@ -60,58 +86,52 @@ export function createTable() {
   wall(68, 490, 128, 592, { restitution: 1.3, points: 10 });
   wall(492, 490, 432, 592, { restitution: 1.3, points: 10 });
 
-  // A funnel in front of the ramp makes its entrance easier to hit.
-  wall(215, 545, 260, 495);
-  wall(345, 545, 300, 495);
+  const portals = layout.portals.map((p) => ({
+    r: p.kind === 'ramp' ? 20 : 16,
+    points: p.kind === 'ramp' ? 500 : 250,
+    ...p,
+  }));
+  for (const ramp of portals.filter((p) => p.kind === 'ramp')) {
+    for (const f of funnelWalls(ramp)) wall(f.ax, f.ay, f.bx, f.by, { restitution: f.restitution });
+  }
 
-  const bumpers = [
-    { x: 225, y: 215, r: 26, points: 100, litFor: 0 },
-    { x: 335, y: 215, r: 26, points: 100, litFor: 0 },
-    { x: 200, y: 345, r: 26, points: 100, litFor: 0 },
-    { x: 360, y: 345, r: 26, points: 100, litFor: 0 },
-  ];
+  const bumpers = layout.bumpers.map((b) => ({ points: 100, litFor: 0, ...b }));
 
   const flippers = [
     { name: 'left', x: 170, y: 700, length: 90, side: 1 },
     { name: 'right', x: 390, y: 700, length: 90, side: -1 },
-    // Controlled by the left button, so one press works both left flippers.
-    { name: 'upperLeft', follows: 'left', x: 30, y: 410, length: 60, side: 1 },
+    // Controlled by a main button, so one press works both flippers on that side.
+    ...layout.upperFlippers.map(({ guideWallX, ...f }) => f),
   ];
-  const guides = [inlaneGuide(flippers[0], 45), inlaneGuide(flippers[1], 515), inlaneGuide(flippers[2], 10)];
+  const guides = [inlaneGuide(flippers[0], 45), inlaneGuide(flippers[1], 515)];
+  layout.upperFlippers.forEach((f, i) => guides.push(inlaneGuide(flippers[2 + i], f.guideWallX)));
   for (const g of guides) wall(g.ax, g.ay, g.bx, g.by);
-
-  const portals = [
-    { id: 'w1', kind: 'wormhole', x: 90, y: 250, r: 16, to: 'w2', points: 250 },
-    { id: 'w2', kind: 'wormhole', x: 500, y: 440, r: 16, to: 'w1', points: 250 },
-    { id: 'w3', kind: 'wormhole', x: 485, y: 250, r: 16, to: 'w4', points: 250 },
-    { id: 'w4', kind: 'wormhole', x: 170, y: 440, r: 16, to: 'w3', points: 250 },
-    { id: 'ramp', kind: 'ramp', x: 280, y: 470, r: 20, width: 40, exit: { x: 280, y: 120 }, points: 500 },
-  ];
 
   const rollovers = ['A', 'B', 'C'].map((letter, i) => ({
     letter, x: 210 + i * 70, y: 70, r: 12, points: 100, lit: false, armed: true,
   }));
 
-  const dropBank = {
+  const dropBanks = layout.dropBanks.map((bank) => ({
     bonus: 1000,
     resetSeconds: 1,
     resetIn: 0,
-    targets: [300, 335, 370].map((y) => ({ ax: 130, ay: y, bx: 130, by: y + 28, points: 50, standing: true })),
-  };
+    targets: bank.ys.map((y) => ({ ax: bank.x, ay: y, bx: bank.x, by: y + 28, points: 50, standing: true })),
+  }));
 
-  const lock = { x: 505, y: 330, r: 16, locked: 0, needed: 2, points: 1000, multiballPoints: 5000 };
+  const lock = { r: 16, locked: 0, needed: 2, points: 1000, multiballPoints: 5000, ...layout.lock };
   const kickback = { x: 27.5, y: 700, r: 14, armed: false };
-  const spinners = [{ x: 160, y: 150, r: 14, points: 10, turns: 0, velocity: 0 }];
+  const spinners = layout.spinners.map((s) => ({ r: 14, points: 10, turns: 0, velocity: 0, ...s }));
 
   return {
+    layoutId: layout.id,
     width,
+    height,
     spinners,
     kickback,
     lock,
-    dropBank,
+    dropBanks,
     portals,
     rollovers,
-    height,
     laneLeft: 550,
     plungerStart: { x: 570, y: 755 },
     walls,

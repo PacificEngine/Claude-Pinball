@@ -1,10 +1,12 @@
 import { classicTheme } from '../theme.js';
+import { classicLayout } from '../layouts/classic.js';
 
 // Bright arcade chiptune in a major key.
 export const classic = {
   id: 'classic',
   name: 'Classic',
   blurb: 'Arcade chiptune',
+  layout: classicLayout,
   theme: classicTheme,
   sound: {
     lead: 'square',

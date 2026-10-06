@@ -1,0 +1,626 @@
+{
+ "walls": [
+  {
+   "ax": 10,
+   "ay": 300,
+   "bx": 11.823,
+   "by": 267.53,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 11.823,
+   "ay": 267.53,
+   "bx": 17.271,
+   "by": 235.469,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 17.271,
+   "ay": 235.469,
+   "bx": 26.274,
+   "by": 204.219,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 26.274,
+   "ay": 204.219,
+   "bx": 38.719,
+   "by": 174.174,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 38.719,
+   "ay": 174.174,
+   "bx": 54.45,
+   "by": 145.711,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 54.45,
+   "ay": 145.711,
+   "bx": 73.269,
+   "by": 119.188,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 73.269,
+   "ay": 119.188,
+   "bx": 94.939,
+   "by": 94.939,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 94.939,
+   "ay": 94.939,
+   "bx": 119.188,
+   "by": 73.269,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 119.188,
+   "ay": 73.269,
+   "bx": 145.711,
+   "by": 54.45,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 145.711,
+   "ay": 54.45,
+   "bx": 174.174,
+   "by": 38.719,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 174.174,
+   "ay": 38.719,
+   "bx": 204.219,
+   "by": 26.274,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 204.219,
+   "ay": 26.274,
+   "bx": 235.469,
+   "by": 17.271,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 235.469,
+   "ay": 17.271,
+   "bx": 267.53,
+   "by": 11.823,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 267.53,
+   "ay": 11.823,
+   "bx": 300,
+   "by": 10,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 300,
+   "ay": 10,
+   "bx": 332.47,
+   "by": 11.823,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 332.47,
+   "ay": 11.823,
+   "bx": 364.531,
+   "by": 17.271,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 364.531,
+   "ay": 17.271,
+   "bx": 395.781,
+   "by": 26.274,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 395.781,
+   "ay": 26.274,
+   "bx": 425.826,
+   "by": 38.719,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 425.826,
+   "ay": 38.719,
+   "bx": 454.289,
+   "by": 54.45,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 454.289,
+   "ay": 54.45,
+   "bx": 480.812,
+   "by": 73.269,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 480.812,
+   "ay": 73.269,
+   "bx": 505.061,
+   "by": 94.939,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 505.061,
+   "ay": 94.939,
+   "bx": 526.731,
+   "by": 119.188,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 526.731,
+   "ay": 119.188,
+   "bx": 545.55,
+   "by": 145.711,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 545.55,
+   "ay": 145.711,
+   "bx": 561.281,
+   "by": 174.174,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 561.281,
+   "ay": 174.174,
+   "bx": 573.726,
+   "by": 204.219,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 573.726,
+   "ay": 204.219,
+   "bx": 582.729,
+   "by": 235.469,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 582.729,
+   "ay": 235.469,
+   "bx": 588.177,
+   "by": 267.53,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 588.177,
+   "ay": 267.53,
+   "bx": 590,
+   "by": 300,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 65.157,
+   "ay": 214.276,
+   "bx": 73.99,
+   "by": 193.138,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 73.99,
+   "ay": 193.138,
+   "bx": 84.721,
+   "by": 172.898,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 84.721,
+   "ay": 172.898,
+   "bx": 97.259,
+   "by": 153.726,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 97.259,
+   "ay": 153.726,
+   "bx": 111.5,
+   "by": 135.781,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 111.5,
+   "ay": 135.781,
+   "bx": 127.324,
+   "by": 119.216,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 127.324,
+   "ay": 119.216,
+   "bx": 144.598,
+   "by": 104.168,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 455.402,
+   "ay": 104.168,
+   "bx": 472.676,
+   "by": 119.216,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 472.676,
+   "ay": 119.216,
+   "bx": 488.5,
+   "by": 135.781,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 488.5,
+   "ay": 135.781,
+   "bx": 502.741,
+   "by": 153.726,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 502.741,
+   "ay": 153.726,
+   "bx": 515.279,
+   "by": 172.898,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 515.279,
+   "ay": 172.898,
+   "bx": 526.01,
+   "by": 193.138,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 526.01,
+   "ay": 193.138,
+   "bx": 534.843,
+   "by": 214.276,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 10,
+   "ay": 300,
+   "bx": 10,
+   "by": 800,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 590,
+   "ay": 300,
+   "bx": 590,
+   "by": 775,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 550,
+   "ay": 340,
+   "bx": 550,
+   "by": 775,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 550,
+   "ay": 775,
+   "bx": 590,
+   "by": 775,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 550,
+   "ay": 340,
+   "bx": 590,
+   "by": 300,
+   "restitution": 0.5,
+   "points": 0,
+   "oneWay": {
+    "nx": -0.707,
+    "ny": -0.707
+   }
+  },
+  {
+   "ax": 45,
+   "ay": 525,
+   "bx": 45,
+   "by": 625,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 515,
+   "ay": 525,
+   "bx": 515,
+   "by": 625,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 68,
+   "ay": 490,
+   "bx": 128,
+   "by": 592,
+   "restitution": 1.3,
+   "points": 10
+  },
+  {
+   "ax": 492,
+   "ay": 490,
+   "bx": 432,
+   "by": 592,
+   "restitution": 1.3,
+   "points": 10
+  },
+  {
+   "ax": 215,
+   "ay": 545,
+   "bx": 260,
+   "by": 495,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 345,
+   "ay": 545,
+   "bx": 300,
+   "by": 495,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 45,
+   "ay": 628.018,
+   "bx": 167.123,
+   "by": 694.735,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 515,
+   "ay": 628.018,
+   "bx": 392.877,
+   "by": 694.735,
+   "restitution": 0.5,
+   "points": 0
+  },
+  {
+   "ax": 10,
+   "ay": 395.38,
+   "bx": 27.123,
+   "by": 404.735,
+   "restitution": 0.5,
+   "points": 0
+  }
+ ],
+ "bumpers": [
+  {
+   "x": 225,
+   "y": 215,
+   "r": 26,
+   "points": 100,
+   "litFor": 0
+  },
+  {
+   "x": 335,
+   "y": 215,
+   "r": 26,
+   "points": 100,
+   "litFor": 0
+  },
+  {
+   "x": 200,
+   "y": 345,
+   "r": 26,
+   "points": 100,
+   "litFor": 0
+  },
+  {
+   "x": 360,
+   "y": 345,
+   "r": 26,
+   "points": 100,
+   "litFor": 0
+  }
+ ],
+ "flippers": [
+  {
+   "name": "left",
+   "x": 170,
+   "y": 700,
+   "length": 90,
+   "side": 1
+  },
+  {
+   "name": "right",
+   "x": 390,
+   "y": 700,
+   "length": 90,
+   "side": -1
+  },
+  {
+   "name": "upperLeft",
+   "follows": "left",
+   "x": 30,
+   "y": 410,
+   "length": 60,
+   "side": 1
+  }
+ ],
+ "portals": [
+  {
+   "id": "w1",
+   "kind": "wormhole",
+   "x": 90,
+   "y": 250,
+   "r": 16,
+   "to": "w2",
+   "points": 250
+  },
+  {
+   "id": "w2",
+   "kind": "wormhole",
+   "x": 500,
+   "y": 440,
+   "r": 16,
+   "to": "w1",
+   "points": 250
+  },
+  {
+   "id": "w3",
+   "kind": "wormhole",
+   "x": 485,
+   "y": 250,
+   "r": 16,
+   "to": "w4",
+   "points": 250
+  },
+  {
+   "id": "w4",
+   "kind": "wormhole",
+   "x": 170,
+   "y": 440,
+   "r": 16,
+   "to": "w3",
+   "points": 250
+  },
+  {
+   "id": "ramp",
+   "kind": "ramp",
+   "x": 280,
+   "y": 470,
+   "r": 20,
+   "width": 40,
+   "exit": {
+    "x": 280,
+    "y": 120
+   },
+   "points": 500
+  }
+ ],
+ "spinners": [
+  {
+   "x": 160,
+   "y": 150,
+   "r": 14,
+   "points": 10,
+   "turns": 0,
+   "velocity": 0
+  }
+ ],
+ "lock": {
+  "x": 505,
+  "y": 330,
+  "r": 16,
+  "locked": 0,
+  "needed": 2,
+  "points": 1000,
+  "multiballPoints": 5000
+ },
+ "kickback": {
+  "x": 27.5,
+  "y": 700,
+  "r": 14,
+  "armed": false
+ },
+ "rollovers": [
+  {
+   "letter": "A",
+   "x": 210,
+   "y": 70,
+   "r": 12,
+   "points": 100,
+   "lit": false,
+   "armed": true
+  },
+  {
+   "letter": "B",
+   "x": 280,
+   "y": 70,
+   "r": 12,
+   "points": 100,
+   "lit": false,
+   "armed": true
+  },
+  {
+   "letter": "C",
+   "x": 350,
+   "y": 70,
+   "r": 12,
+   "points": 100,
+   "lit": false,
+   "armed": true
+  }
+ ],
+ "dropTargets": [
+  {
+   "ax": 130,
+   "ay": 300,
+   "bx": 130,
+   "by": 328,
+   "points": 50,
+   "standing": true
+  },
+  {
+   "ax": 130,
+   "ay": 335,
+   "bx": 130,
+   "by": 363,
+   "points": 50,
+   "standing": true
+  },
+  {
+   "ax": 130,
+   "ay": 370,
+   "bx": 130,
+   "by": 398,
+   "points": 50,
+   "standing": true
+  }
+ ],
+ "dropBonus": 1000
+}

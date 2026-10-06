@@ -1,10 +1,12 @@
 import { classicTheme } from '../theme.js';
+import { deepSpaceLayout } from '../layouts/deepSpace.js';
 
 // Slow, spacey and minor: soft pads, sparse drums.
 export const deepSpace = {
   id: 'deep-space',
   name: 'Deep space',
   blurb: 'Ambient drift',
+  layout: deepSpaceLayout,
   theme: {
     ...classicTheme,
     name: 'deep-space',

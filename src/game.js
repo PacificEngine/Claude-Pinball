@@ -33,11 +33,12 @@ const NUDGES = {
 const SHAKE_PIXELS = 6;
 const SHAKE_DECAY_PER_SECOND = 30;
 
-export function createGame() {
-  const table = createTable();
+export function createGame(layout) {
+  const table = createTable(layout);
   const flippers = {};
   for (const f of table.flippers) flippers[f.name] = createFlipper(f);
   const game = {
+    layout,
     table,
     flippers,
     held: { left: false, right: false },
@@ -85,7 +86,7 @@ function serveBall(game) {
 }
 
 export function restart(game) {
-  Object.defineProperties(game, Object.getOwnPropertyDescriptors(createGame()));
+  Object.defineProperties(game, Object.getOwnPropertyDescriptors(createGame(game.layout)));
 }
 
 export function chargePlunger(game, amount) {

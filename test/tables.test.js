@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { TABLES } from '../src/tables/index.js';
+import { createGame, restart } from '../src/game.js';
 import { classicTheme } from '../src/theme.js';
 import { createMenu, moveSelection, selectedTable } from '../src/menu.js';
 import { getHighScore, recordScore } from '../src/highScores.js';
@@ -42,6 +43,31 @@ describe('tables', () => {
   it('look different from each other', () => {
     const backgrounds = TABLES.map((t) => t.theme.background);
     expect(new Set(backgrounds).size).toBe(3);
+  });
+});
+
+describe('table layouts', () => {
+  it('each table has its own layout', () => {
+    expect(new Set(TABLES.map((t) => t.layout.id)).size).toBe(TABLES.length);
+    for (const t of TABLES) expect(t.layout.id, t.id).toBeTruthy();
+  });
+
+  it('are genuinely different tables, not recolors', () => {
+    const spots = (t) => JSON.stringify(createGame(t.layout).table.bumpers.map((b) => [b.x, b.y]));
+    expect(new Set(TABLES.map(spots)).size).toBe(TABLES.length);
+    const ramps = TABLES.map((t) => JSON.stringify(createGame(t.layout).table.portals.find((p) => p.kind === 'ramp').exit));
+    expect(new Set(ramps).size).toBe(TABLES.length);
+  });
+
+  it('a game is built on the layout it was given and keeps it on restart', () => {
+    for (const t of TABLES) {
+      const g = createGame(t.layout);
+      expect(g.table.layoutId).toBe(t.layout.id);
+      g.score = 99;
+      restart(g);
+      expect(g.table.layoutId).toBe(t.layout.id);
+      expect(g.score).toBe(0);
+    }
   });
 });
 

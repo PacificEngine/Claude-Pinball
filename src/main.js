@@ -28,7 +28,7 @@ let previewing = false; // menu music, which can only start after the first key 
 
 function startGame() {
   table = selectedTable(menu);
-  game = createGame();
+  game = createGame(table.layout);
   newBest = false;
   charging = false;
   audio.setTable(table);

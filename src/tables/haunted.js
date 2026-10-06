@@ -1,10 +1,12 @@
 import { classicTheme } from '../theme.js';
+import { hauntedLayout } from '../layouts/haunted.js';
 
 // A creaky minor-key waltz (three beats to the bar) on organ-like voices.
 export const haunted = {
   id: 'haunted',
   name: 'Haunted mansion',
   blurb: 'Spooky waltz',
+  layout: hauntedLayout,
   theme: {
     ...classicTheme,
     name: 'haunted',

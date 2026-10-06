@@ -5,7 +5,10 @@ const THICKNESS = 3;
 const RESTITUTION = 0.5;
 
 export function collideDropTargets(game, ball, addScore) {
-  const bank = game.table.dropBank;
+  for (const bank of game.table.dropBanks) collideBank(game, bank, ball, addScore);
+}
+
+function collideBank(game, bank, ball, addScore) {
   for (const t of bank.targets) {
     if (!t.standing) continue;
     const hit = collideSegment(ball, t, RESTITUTION, null, THICKNESS);
@@ -22,7 +25,10 @@ export function collideDropTargets(game, ball, addScore) {
 }
 
 export function tickDropTargets(game, dt) {
-  const bank = game.table.dropBank;
+  for (const bank of game.table.dropBanks) tickBank(bank, dt);
+}
+
+function tickBank(bank, dt) {
   if (bank.resetIn <= 0) return;
   bank.resetIn -= dt;
   if (bank.resetIn <= 0) for (const t of bank.targets) t.standing = true;
