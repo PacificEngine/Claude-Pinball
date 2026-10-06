@@ -1,4 +1,4 @@
-import { createGame, update, chargePlunger, releasePlunger, setFlipper, restart, nudge } from './game.js';
+import { createGame, update, chargePlunger, releasePlunger, setFlipper, restart, nudge, drainEvents } from './game.js';
 import { render } from './render.js';
 
 const ctx = document.getElementById('table').getContext('2d');
@@ -32,6 +32,9 @@ window.addEventListener('keyup', (e) => {
   e.preventDefault();
 });
 
+// Sound and music will subscribe here.
+function onGameEvent() {}
+
 let last = performance.now();
 function frame(now) {
   const dt = Math.min((now - last) / 1000, 1 / 30);
@@ -39,6 +42,7 @@ function frame(now) {
   if (charging) chargePlunger(game, CHARGE_PER_SECOND * dt);
   update(game, dt);
   render(ctx, game);
+  for (const event of drainEvents(game)) onGameEvent(event);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
