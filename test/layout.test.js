@@ -23,6 +23,6 @@ describe('ramp corridor', () => {
 
   it('keeps drop targets and solid walls out of the corridor too', () => {
     const c = corridor();
-    for (const t of c.t.dropBank.targets) expect(clear(c, { x: t.ax, y: (t.ay + t.by) / 2 })).toBe(true);
+    for (const t of c.t.dropBanks.flatMap((b) => b.targets)) expect(clear(c, { x: t.ax, y: (t.ay + t.by) / 2 })).toBe(true);
   });
 });

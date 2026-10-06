@@ -1,7 +1,7 @@
 import { classicTheme } from './theme.js';
 import { flipperSegment, FLIPPER_THICKNESS } from './flipper.js';
 
-export function render(ctx, game, theme = classicTheme) {
+export function render(ctx, game, theme = classicTheme, hud = {}) {
   const { table } = game;
   ctx.save();
   ctx.translate(game.shake.x, game.shake.y);
@@ -87,16 +87,34 @@ export function render(ctx, game, theme = classicTheme) {
   drawMission(ctx, game, theme);
   ctx.restore();
 
+  drawAudioStatus(ctx, game, theme, hud.audio);
+
   if (game.phase === 'gameover') {
     ctx.fillStyle = theme.overlay;
-    ctx.fillRect(0, 300, table.width, 140);
+    ctx.fillRect(0, 290, table.width, 190);
     ctx.fillStyle = theme.text;
     ctx.textAlign = 'center';
     ctx.font = '36px monospace';
-    ctx.fillText('GAME OVER', table.width / 2, 360);
+    ctx.fillText('GAME OVER', table.width / 2, 350);
     ctx.font = '18px monospace';
-    ctx.fillText(`Final score ${game.score} — press Enter`, table.width / 2, 400);
+    ctx.fillText(`Final score ${game.score}`, table.width / 2, 388);
+    if (hud.newBest) {
+      ctx.fillStyle = theme.banner;
+      ctx.fillText('NEW BEST!', table.width / 2, 416);
+    } else if (hud.best) {
+      ctx.fillText(`Best ${hud.best}`, table.width / 2, 416);
+    }
+    ctx.fillStyle = theme.textMuted;
+    ctx.fillText('press Enter for the table menu', table.width / 2, 452);
   }
+}
+
+function drawAudioStatus(ctx, game, theme, audio) {
+  if (!audio) return;
+  ctx.font = '11px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = theme.textMuted;
+  ctx.fillText(`M music ${audio.musicOn ? 'on' : 'off'} · N sound ${audio.sfxOn ? 'on' : 'off'}`, 24, game.table.height - 30);
 }
 
 function drawTilt(ctx, game, theme) {
@@ -146,9 +164,11 @@ function drawRollovers(ctx, game, theme) {
 
 function drawDropTargets(ctx, game, theme) {
   ctx.lineWidth = 7;
-  for (const t of game.table.dropBank.targets) {
-    ctx.strokeStyle = t.standing ? theme.dropTarget : theme.dropTargetDown;
-    line(ctx, t.ax, t.ay, t.bx, t.by);
+  for (const bank of game.table.dropBanks) {
+    for (const t of bank.targets) {
+      ctx.strokeStyle = t.standing ? theme.dropTarget : theme.dropTargetDown;
+      line(ctx, t.ax, t.ay, t.bx, t.by);
+    }
   }
 }
 
@@ -207,16 +227,22 @@ function drawSpinners(ctx, game, theme) {
 // The ramp is drawn over everything on the table, so whatever passes beneath it is hidden.
 function drawRamp(ctx, game, theme) {
   const ramp = game.table.portals.find((p) => p.kind === 'ramp');
+  const { x, y, exit } = ramp;
+  const length = Math.hypot(exit.x - x, exit.y - y);
+  const dx = (exit.x - x) / length;
+  const dy = (exit.y - y) / length;
+  const nx = -dy;
+  const ny = dx;
   const near = ramp.width / 2;
   const far = near * 0.7;
-  const { x, y, exit } = ramp;
+  const corner = (px, py, half, side) => [px + nx * half * side, py + ny * half * side];
 
   ctx.fillStyle = theme.rampSurface;
   ctx.beginPath();
-  ctx.moveTo(x - near, y);
-  ctx.lineTo(exit.x - far, exit.y);
-  ctx.lineTo(exit.x + far, exit.y);
-  ctx.lineTo(x + near, y);
+  ctx.moveTo(...corner(x, y, near, -1));
+  ctx.lineTo(...corner(exit.x, exit.y, far, -1));
+  ctx.lineTo(...corner(exit.x, exit.y, far, 1));
+  ctx.lineTo(...corner(x, y, near, 1));
   ctx.closePath();
   ctx.fill();
 
@@ -224,20 +250,21 @@ function drawRamp(ctx, game, theme) {
   ctx.lineWidth = 2;
   for (let i = 1; i <= 6; i++) {
     const f = i / 7;
+    const cx = x + (exit.x - x) * f;
     const cy = y + (exit.y - y) * f;
     const w = (near + (far - near) * f) * 0.5;
     ctx.beginPath();
-    ctx.moveTo(x - w, cy + w * 0.6);
-    ctx.lineTo(x, cy);
-    ctx.lineTo(x + w, cy + w * 0.6);
+    ctx.moveTo(cx - nx * w - dx * w * 0.6, cy - ny * w - dy * w * 0.6);
+    ctx.lineTo(cx, cy);
+    ctx.lineTo(cx + nx * w - dx * w * 0.6, cy + ny * w - dy * w * 0.6);
     ctx.stroke();
   }
 
   ctx.strokeStyle = theme.ramp;
   ctx.lineWidth = 3;
-  line(ctx, x - near, y, exit.x - far, exit.y);
-  line(ctx, x + near, y, exit.x + far, exit.y);
-  line(ctx, x - near, y, x + near, y);
+  line(ctx, ...corner(x, y, near, -1), ...corner(exit.x, exit.y, far, -1));
+  line(ctx, ...corner(x, y, near, 1), ...corner(exit.x, exit.y, far, 1));
+  line(ctx, ...corner(x, y, near, -1), ...corner(x, y, near, 1));
 }
 
 function drawPlunger(ctx, game, theme) {
