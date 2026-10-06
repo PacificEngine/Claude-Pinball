@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { withoutCombo } from './helpers.js';
 import { createGame, update, drainEvents } from '../src/game.js';
 
 const playing = () => {
@@ -37,7 +38,7 @@ describe('drop targets', () => {
   });
 
   it('pay a bonus for clearing the bank, then stand back up', () => {
-    const g = playing();
+    const g = withoutCombo(playing());
     const { targets } = g.table.dropBank;
     targets.forEach((t) => hit(g, t));
     expect(g.score).toBe(targets.length * targets[0].points + g.table.dropBank.bonus);

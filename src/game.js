@@ -6,6 +6,10 @@ import { addScore } from './score.js';
 import { startMissions, tickBanner } from './missions.js';
 import { checkRollovers, resetRollovers, MULTIPLIERS } from './rollovers.js';
 import { collideDropTargets, tickDropTargets } from './dropTargets.js';
+import { skillShotListener, tickSkillShot } from './skillShot.js';
+import { comboListener, tickCombo, resetCombo } from './combo.js';
+import { checkSpinners, tickSpinners } from './spinner.js';
+import { checkKickback, armKickbackOnMission } from './kickback.js';
 import { checkLock } from './lock.js';
 import { checkPortals, advanceTransit, tickCooldown } from './portals.js';
 
@@ -17,6 +21,8 @@ const MAX_SPEED = 1800;
 const BALLS_PER_GAME = 3;
 const FLIPPER_RESTITUTION = 0.4;
 const LIT_SECONDS = 0.15;
+
+export const BALL_SAVE_SECONDS = 10;
 
 export const TILT = { limit: 5, warnAt: 3, drainPerSecond: 1, nudgeSpeed: 120 };
 const NUDGES = {
@@ -45,6 +51,9 @@ export function createGame() {
     ballsLeft: BALLS_PER_GAME,
     plungerCharge: 0,
     phase: 'plunging',
+    ballSave: 0,
+    skillShot: 0,
+    combo: { count: 0, timer: 0 },
     multiplier: MULTIPLIERS[0],
     multiplierLevel: 0,
     tilt: 0,
@@ -53,6 +62,7 @@ export function createGame() {
     shake: { x: 0, y: 0 }, // purely visual
   };
   startMissions(game);
+  game.listeners.push(armKickbackOnMission, skillShotListener, comboListener);
   serveBall(game);
   game.events.length = 0;
   return game;
@@ -69,6 +79,8 @@ function serveBall(game) {
   game.tiltWarning = false;
   game.tilted = false;
   resetRollovers(game);
+  resetCombo(game);
+  game.skillShot = 0;
   emit(game, 'ball-served');
 }
 
@@ -86,6 +98,7 @@ export function releasePlunger(game) {
   game.ball.vy = -(300 + 900 * game.plungerCharge);
   game.plungerCharge = 0;
   game.phase = 'playing';
+  game.ballSave = BALL_SAVE_SECONDS;
   emit(game, 'launch');
 }
 
@@ -119,14 +132,19 @@ function decayShake(shake, dt) {
 }
 
 export function update(game, dt) {
-  for (const name of Object.keys(game.flippers)) {
-    updateFlipper(game.flippers[name], dt, game.held[name] && !game.tilted);
+  for (const f of game.table.flippers) {
+    const button = f.follows || f.name;
+    updateFlipper(game.flippers[f.name], dt, game.held[button] && !game.tilted);
   }
+  if (game.phase === 'playing') game.ballSave = Math.max(0, game.ballSave - dt);
   game.tilt = Math.max(0, game.tilt - TILT.drainPerSecond * dt);
   game.tiltWarning = game.tilt >= TILT.warnAt;
   decayShake(game.shake, dt);
   tickDropTargets(game, dt);
   tickBanner(game, dt);
+  tickSpinners(game, dt, addScore);
+  tickSkillShot(game, dt);
+  tickCombo(game, dt);
   for (const b of game.table.bumpers) b.litFor = Math.max(0, b.litFor - dt);
   if (game.phase !== 'playing') return;
 
@@ -174,6 +192,8 @@ function stepPlayingBall(game, ball, h) {
   }
   for (const f of Object.values(game.flippers)) collideFlipper(ball, f, FLIPPER_RESTITUTION);
   collideDropTargets(game, ball, addScore);
+  checkSpinners(game, ball);
+  checkKickback(game, ball);
   checkLock(game, ball, addScore, serveBall);
   checkPortals(game, ball, addScore);
   checkRollovers(game, ball, addScore);
@@ -185,6 +205,11 @@ function drainBall(game, ball) {
     emit(game, 'drain', { multiball: true });
     if (game.balls.length === 1) emit(game, 'multiball-end');
     return;
+  }
+  if (game.ballSave > 0) {
+    game.ballSave = 0;
+    emit(game, 'ball-saved');
+    return serveBall(game);
   }
   game.ballsLeft -= 1;
   emit(game, 'drain');
