@@ -1,7 +1,7 @@
 import { classicTheme } from './theme.js';
 import { flipperSegment, FLIPPER_THICKNESS } from './flipper.js';
 
-export function render(ctx, game, theme = classicTheme) {
+export function render(ctx, game, theme = classicTheme, hud = {}) {
   const { table } = game;
   ctx.save();
   ctx.translate(game.shake.x, game.shake.y);
@@ -87,16 +87,34 @@ export function render(ctx, game, theme = classicTheme) {
   drawMission(ctx, game, theme);
   ctx.restore();
 
+  drawAudioStatus(ctx, game, theme, hud.audio);
+
   if (game.phase === 'gameover') {
     ctx.fillStyle = theme.overlay;
-    ctx.fillRect(0, 300, table.width, 140);
+    ctx.fillRect(0, 290, table.width, 190);
     ctx.fillStyle = theme.text;
     ctx.textAlign = 'center';
     ctx.font = '36px monospace';
-    ctx.fillText('GAME OVER', table.width / 2, 360);
+    ctx.fillText('GAME OVER', table.width / 2, 350);
     ctx.font = '18px monospace';
-    ctx.fillText(`Final score ${game.score} — press Enter`, table.width / 2, 400);
+    ctx.fillText(`Final score ${game.score}`, table.width / 2, 388);
+    if (hud.newBest) {
+      ctx.fillStyle = theme.banner;
+      ctx.fillText('NEW BEST!', table.width / 2, 416);
+    } else if (hud.best) {
+      ctx.fillText(`Best ${hud.best}`, table.width / 2, 416);
+    }
+    ctx.fillStyle = theme.textMuted;
+    ctx.fillText('press Enter for the table menu', table.width / 2, 452);
   }
+}
+
+function drawAudioStatus(ctx, game, theme, audio) {
+  if (!audio) return;
+  ctx.font = '11px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = theme.textMuted;
+  ctx.fillText(`M music ${audio.musicOn ? 'on' : 'off'} · N sound ${audio.sfxOn ? 'on' : 'off'}`, 24, game.table.height - 30);
 }
 
 function drawTilt(ctx, game, theme) {
