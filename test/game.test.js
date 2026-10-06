@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createGame, update, chargePlunger, releasePlunger, setFlipper, restart } from '../src/game.js';
+import { createGame, update, chargePlunger, releasePlunger, setFlipper, restart, nudge, TILT } from '../src/game.js';
 
 const run = (g, seconds, dt = 1 / 120) => {
   for (let t = 0; t < seconds; t += dt) update(g, dt);
@@ -142,5 +142,123 @@ describe('inlane guides', () => {
       run(g, 8);
       expect(g.ballsLeft, `ball released at x=${x}`).toBe(2);
     }
+  });
+});
+
+describe('nudging', () => {
+  const playing = () => {
+    const g = createGame();
+    g.phase = 'playing';
+    Object.assign(g.ball, { x: 300, y: 400, vx: 0, vy: 0 });
+    return g;
+  };
+
+  it('kicks the ball in the nudged direction', () => {
+    const g = playing();
+    nudge(g, 'left');
+    expect(g.ball.vx).toBeLessThan(0);
+    nudge(g, 'right');
+    nudge(g, 'right');
+    expect(g.ball.vx).toBeGreaterThan(0);
+    nudge(g, 'up');
+    expect(g.ball.vy).toBeLessThan(0);
+  });
+
+  it('does nothing while the ball is waiting at the plunger', () => {
+    const g = createGame();
+    nudge(g, 'left');
+    expect(g.ball.vx).toBe(0);
+    expect(g.tilt).toBe(0);
+  });
+
+  it('builds up the tilt meter, which drains with time', () => {
+    const g = playing();
+    nudge(g, 'left');
+    nudge(g, 'left');
+    expect(g.tilt).toBe(2);
+    g.ball.vy = 0;
+    g.phase = 'playing';
+    for (let t = 0; t < 1; t += 1 / 120) { g.ball.y = 400; update(g, 1 / 120); }
+    expect(g.tilt).toBeCloseTo(2 - TILT.drainPerSecond, 1);
+  });
+
+  it('never drains below zero', () => {
+    const g = playing();
+    for (let i = 0; i < 120; i++) { g.ball.y = 400; update(g, 1 / 60); }
+    expect(g.tilt).toBe(0);
+  });
+
+  it('warns before it tilts', () => {
+    const g = playing();
+    for (let i = 0; i < TILT.warnAt; i++) nudge(g, 'left');
+    expect(g.tilted).toBe(false);
+    expect(g.tiltWarning).toBe(true);
+  });
+});
+
+describe('tilting', () => {
+  const tilt = () => {
+    const g = createGame();
+    g.phase = 'playing';
+    Object.assign(g.ball, { x: 300, y: 400, vx: 0, vy: 0 });
+    for (let i = 0; i < TILT.limit; i++) nudge(g, 'left');
+    return g;
+  };
+
+  it('trips when the meter reaches the limit', () => {
+    expect(tilt().tilted).toBe(true);
+  });
+
+  it('drops the flippers and ignores the buttons', () => {
+    const g = tilt();
+    setFlipper(g, 'left', true);
+    for (let i = 0; i < 30; i++) { g.ball.y = 400; update(g, 1 / 60); }
+    expect(g.flippers.left.angle).toBeGreaterThan(0);
+  });
+
+  it('lowers raised flippers that were already up', () => {
+    const g = createGame();
+    g.phase = 'playing';
+    Object.assign(g.ball, { x: 300, y: 400, vx: 0, vy: 0 });
+    setFlipper(g, 'right', true);
+    for (let i = 0; i < 20; i++) { g.ball.y = 400; update(g, 1 / 60); }
+    expect(g.flippers.right.angle).toBeLessThan(0);
+    for (let i = 0; i < TILT.limit; i++) nudge(g, 'left');
+    for (let i = 0; i < 30; i++) { g.ball.y = 400; update(g, 1 / 60); }
+    expect(g.flippers.right.angle).toBeGreaterThan(0);
+  });
+
+  it('stops further nudging from moving the ball', () => {
+    const g = tilt();
+    const vx = g.ball.vx;
+    nudge(g, 'right');
+    expect(g.ball.vx).toBe(vx);
+  });
+
+  it('stops scoring, though bumpers still bounce the ball', () => {
+    const g = tilt();
+    const bumper = g.table.bumpers[0];
+    Object.assign(g.ball, { x: bumper.x - bumper.r - g.ball.r + 1, y: bumper.y, vx: 100, vy: 0 });
+    update(g, 1 / 120);
+    expect(g.score).toBe(0);
+    expect(g.ball.vx).toBeLessThan(0);
+  });
+
+  it('clears when the ball drains, so the next ball plays normally', () => {
+    const g = tilt();
+    g.ball.y = g.table.height + 50;
+    update(g, 1 / 120);
+    expect(g.ballsLeft).toBe(2);
+    expect(g.tilted).toBe(false);
+    expect(g.tilt).toBe(0);
+    expect(g.phase).toBe('plunging');
+  });
+
+  it('does not stop the last ball ending the game', () => {
+    const g = tilt();
+    g.ballsLeft = 1;
+    g.ball.y = g.table.height + 50;
+    update(g, 1 / 120);
+    expect(g.phase).toBe('gameover');
   });
 });

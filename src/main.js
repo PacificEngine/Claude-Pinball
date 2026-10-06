@@ -1,4 +1,4 @@
-import { createGame, update, chargePlunger, releasePlunger, setFlipper, restart } from './game.js';
+import { createGame, update, chargePlunger, releasePlunger, setFlipper, restart, nudge } from './game.js';
 import { render } from './render.js';
 
 const ctx = document.getElementById('table').getContext('2d');
@@ -11,8 +11,12 @@ const FLIPPER_KEYS = {
   Slash: 'right', ArrowRight: 'right',
 };
 
+const NUDGE_KEYS = { KeyA: 'left', KeyD: 'right', KeyW: 'up', ArrowUp: 'up' };
+
 window.addEventListener('keydown', (e) => {
-  if (e.code in FLIPPER_KEYS) setFlipper(game, FLIPPER_KEYS[e.code], true);
+  if (e.code in NUDGE_KEYS) {
+    if (!e.repeat) nudge(game, NUDGE_KEYS[e.code]);
+  } else if (e.code in FLIPPER_KEYS) setFlipper(game, FLIPPER_KEYS[e.code], true);
   else if (e.code === 'Space') charging = true;
   else if (e.code === 'Enter' && game.phase === 'gameover') restart(game);
   else return;
